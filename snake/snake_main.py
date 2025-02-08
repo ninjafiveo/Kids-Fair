@@ -12,8 +12,8 @@ BLOCK_SIZE = 20
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GREEN = (0, 200, 0)
-RED = (200, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
 
 # Initialize screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -23,10 +23,11 @@ pygame.display.set_caption("Snake Game")
 clock = pygame.time.Clock()
 
 # Snake and food
-snake_pos = [100, 50]  # Initial position of the snake
-snake_body = [[100, 50], [80, 50], [60, 50]]  # Initial body (3 blocks)
-food_pos = [random.randrange(1, WIDTH // BLOCK_SIZE) * BLOCK_SIZE,
-            random.randrange(1, HEIGHT // BLOCK_SIZE) * BLOCK_SIZE]
+# Update snake starting position so that both coordinates are multiples of BLOCK_SIZE.
+snake_pos = [100, 60]  # Starting at [100,60] ensures alignment with the grid
+snake_body = [[100, 60], [80, 60], [60, 60]]  # Snake body aligned horizontally
+food_pos = [random.randint(0, (WIDTH // BLOCK_SIZE) - 1) * BLOCK_SIZE,
+            random.randint(0, (HEIGHT // BLOCK_SIZE) - 1) * BLOCK_SIZE]
 food_spawn = True
 
 # Direction variables
@@ -82,29 +83,33 @@ while running:
     if direction == "RIGHT":
         snake_pos[0] += BLOCK_SIZE
 
-    # Snake body growing mechanism
-    snake_body.insert(0, list(snake_pos))
+    # Check if the snake eats food
     if snake_pos == food_pos:
         score += 1
-        food_spawn = False
+        food_spawn = False  # Mark that the food should be respawned
     else:
-        snake_body.pop()
+        snake_body.pop()  # Remove the last segment if no food is eaten
 
+    # Spawn new food if needed
     if not food_spawn:
-        food_pos = [random.randrange(1, WIDTH // BLOCK_SIZE) * BLOCK_SIZE,
-                    random.randrange(1, HEIGHT // BLOCK_SIZE) * BLOCK_SIZE]
-    food_spawn = True
+        food_pos = [random.randint(0, (WIDTH // BLOCK_SIZE) - 1) * BLOCK_SIZE,
+                    random.randint(0, (HEIGHT // BLOCK_SIZE) - 1) * BLOCK_SIZE]
+        food_spawn = True
 
-    # Check for collisions
+    # Add the new head to the snake
+    snake_body.insert(0, list(snake_pos))
+
+    # Check for collisions with walls
     if (snake_pos[0] < 0 or snake_pos[0] >= WIDTH or
         snake_pos[1] < 0 or snake_pos[1] >= HEIGHT):
         game_over()
+    # Check for collisions with itself
     for block in snake_body[1:]:
         if snake_pos == block:
             game_over()
 
     # Draw everything
-    screen.fill(BLACK)
+    screen.fill(BLACK)  # Clear the screen
     for block in snake_body:
         pygame.draw.rect(screen, GREEN, pygame.Rect(block[0], block[1], BLOCK_SIZE, BLOCK_SIZE))
     pygame.draw.rect(screen, RED, pygame.Rect(food_pos[0], food_pos[1], BLOCK_SIZE, BLOCK_SIZE))
