@@ -40,8 +40,7 @@ brick_colors = [
 ]
 
 # Paddle settings
-# paddle_width = 1000 # Paddle Cheat
-paddle_width = 100
+# paddle_width = 1000 # Paddle Cheatpaddle_width = 100
 paddle_height = 15
 paddle_speed = 7
 paddle = pygame.Rect(WIDTH // 2 - paddle_width // 2, HEIGHT - 40, paddle_width, paddle_height)
